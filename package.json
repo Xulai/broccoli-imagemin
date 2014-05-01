@@ -1,0 +1,53 @@
+{
+  "name": "broccoli-imagemin",
+  "version": "0.1.0",
+  "description": "Minifies either png, jpg or gif with Broccoli",
+  "homepage": "https://github.com/xulai/broccoli-imagemin",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/xulai/broccoli-imagemin.git"
+  },
+  "author": {
+    "name": "Daniel Beauchamp",
+    "email": "danielbeauchamp@crimasi.com",
+    "url": "https://crimasi.com/danielbeauchamp"
+  },
+  "main": "./index.js",
+  "keywords": [
+    "broccoli-plugin",
+    "broccoli-filter",
+    "broccoli",
+    "imagemin",
+    "compress",
+		"minify",
+		"image",
+		"img",
+		"jpeg",
+		"jpg",
+		"png",
+		"gif"
+  ],
+  "scripts": {
+    "test": "broccoli build temp && mocha"
+  },
+  "dependencies": {
+    "broccoli-filter": "^0.1.0",
+    "imagemin": "^0.4.5",
+		"debug": "~0.7.4",
+		"pretty-bytes": "^0.1.0",
+		"stat-mode": "^0.2.0"
+  },
+  "devDependencies": {
+    "broccoli": "^0.9.0",
+    "mocha": "1.17.1",
+    "rimraf": "~2.2.6",
+    "should": "3.1.2",
+    "broccoli-cli": "^0.0.1"
+  },
+  "licenses": [
+    {
+      "type": "ISC",
+      "url": "https://raw.github.com/xulai/broccoli-imagemin/master/LICENSE.md"
+    }
+  ]
+}
