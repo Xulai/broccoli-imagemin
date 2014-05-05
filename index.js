@@ -5,20 +5,21 @@ var prettyBytes = require('pretty-bytes');
 var mode = require('stat-mode');
 var fs = require('fs');
 
-function imageminFilter(inputTree, options) {
+function imageminFilter(inputTree, optns) {
 	debug('Creating imageminFilter instance');
 
   if(!(this instanceof imageminFilter)) {
-    return new imageminFilter(inputTree, options);
+    return new imageminFilter(inputTree, optns);
   }
 
-	this.options = options || {
+	this.options = optns || {
 		interlaced: true,
 		optimizationLevel: 3,
 		progressive: true,
 		lossyPNG: false
 	};
 
+	var options = this.options;
 	var ImageMin = this.ImageMin = require('imagemin');
   var imagemin = this.imagemin = new ImageMin();
 
