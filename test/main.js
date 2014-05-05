@@ -12,6 +12,7 @@ after(function() {
   if(cleanupOutput){
     rimraf.sync(outputDir);
   }
+	rimraf.sync('tmp/**/*');
   rimraf.sync('tmp');
 });
 

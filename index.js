@@ -4,6 +4,7 @@ var debug = require('debug')('imageminFilter');
 var prettyBytes = require('pretty-bytes');
 var mode = require('stat-mode');
 var fs = require('fs');
+var Promise = require('rsvp').Promise
 
 function imageminFilter(inputTree, optns) {
 	debug('Creating imageminFilter instance');
@@ -55,6 +56,7 @@ imageminFilter.prototype.processString = function(str, file) {
 	var tempfile = {};
 	var stats = fs.statSync(fileNamePath);
 
+	console.log(mode(stats).toOctal());
 	tempfile.contents = str;
 	tempfile.mode = mode(stats).toOctal();
 
@@ -80,6 +82,16 @@ imageminFilter.prototype.processString = function(str, file) {
 
 	debug('Returning optimized image');
 	return str;
+};
+
+imageminFilter.prototype.processFile = function (srcDir, destDir, relativePath) {
+  var self = this
+  var string = fs.readFileSync(srcDir + '/' + relativePath);
+  return Promise.resolve(self.processString(string, relativePath))
+    .then(function (outputString) {
+      var outputPath = self.getDestFilePath(relativePath)
+      fs.writeFileSync(destDir + '/' + outputPath, outputString)
+    });
 };
 
 module.exports = imageminFilter;
