@@ -56,7 +56,6 @@ imageminFilter.prototype.processString = function(str, file) {
 	var tempfile = {};
 	var stats = fs.statSync(fileNamePath);
 
-	console.log(mode(stats).toOctal());
 	tempfile.contents = str;
 	tempfile.mode = mode(stats).toOctal();
 
