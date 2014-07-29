@@ -49,44 +49,46 @@ imageminFilter.prototype.extensions = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
 
 imageminFilter.prototype.processString = function(str, file) {
   var fileNamePath = './' + this.inputTree + '/' + file;
-	debug('Processing Buffer ' + fileNamePath);
+  debug('Processing Buffer ' + fileNamePath);
 
-	var extenson = this.targetExtension = file.split('.').pop().toLowerCase();
-	var imagemin = this.imagemin;
-	var tempfile = {};
-	var stats = fs.statSync(fileNamePath);
+  var extenson = this.targetExtension = file.split('.').pop().toLowerCase();
+  var imagemin = this.imagemin;
+  var tempfile = {};
+  var stats = fs.statSync(fileNamePath);
 
-	tempfile.contents = str;
-	tempfile.mode = mode(stats).toOctal();
+  return new Promise(function(resolve, reject) {
+    tempfile.contents = str;
+    tempfile.mode = mode(stats).toOctal();
 
-	debug('Optimizing image ' + fileNamePath);
-  imagemin.run(tempfile, function (err, fileOpti) {
-            if (err) {
-                return debug(err);
-            }
+    debug('Optimizing image ' + fileNamePath);
+    imagemin.run(tempfile, function (err, fileOpti) {
+      if (err) {
+        debug(err);
+        return reject(err);
+      }
 
-						var origSize = fs.statSync(fileNamePath).size;
-						var diffSize = origSize - fileOpti.contents.length;
+      var origSize = fs.statSync(fileNamePath).size;
+      var diffSize = origSize - fileOpti.contents.length;
 
-            if (!(fileOpti.contents.length >= str.length)) {
-               str = fileOpti.contents;
-            }
+      if (!(fileOpti.contents.length >= str.length)) {
+        str = fileOpti.contents;
+      }
 
-						if(diffSize < 10) {
-							debug('Already optimized');
-						} else {
-							debug('Saved ' + prettyBytes(diffSize) + ' - ' + (diffSize / origSize * 100).toFixed() + '%');
-        }
-	});
+      if(diffSize < 10) {
+        debug('Already optimized');
+      } else {
+        debug('Saved ' + prettyBytes(diffSize) + ' - ' + (diffSize / origSize * 100).toFixed() + '%');
+      }
 
-	debug('Returning optimized image');
-	return str;
+      return resolve(str);
+    });
+  });
 };
 
 imageminFilter.prototype.processFile = function (srcDir, destDir, relativePath) {
   var self = this
   var string = fs.readFileSync(srcDir + '/' + relativePath);
-  return Promise.resolve(self.processString(string, relativePath))
+  return self.processString(string, relativePath)
     .then(function (outputString) {
       var outputPath = self.getDestFilePath(relativePath)
       fs.writeFileSync(destDir + '/' + outputPath, outputString)
