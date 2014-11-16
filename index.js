@@ -47,8 +47,8 @@ imageminFilter.prototype.constructor = imageminFilter;
 
 imageminFilter.prototype.extensions = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
 
-imageminFilter.prototype.processString = function(str, file) {
-  var fileNamePath = './' + this.inputTree + '/' + file;
+imageminFilter.prototype.processString = function(str, srcDir, file) {
+  var fileNamePath = srcDir + '/' + file;
   debug('Processing Buffer ' + fileNamePath);
 
   var extenson = this.targetExtension = file.split('.').pop().toLowerCase();
@@ -88,7 +88,7 @@ imageminFilter.prototype.processString = function(str, file) {
 imageminFilter.prototype.processFile = function (srcDir, destDir, relativePath) {
   var self = this
   var string = fs.readFileSync(srcDir + '/' + relativePath);
-  return self.processString(string, relativePath)
+  return self.processString(string, srcDir, relativePath)
     .then(function (outputString) {
       var outputPath = self.getDestFilePath(relativePath)
       fs.writeFileSync(destDir + '/' + outputPath, outputString)
