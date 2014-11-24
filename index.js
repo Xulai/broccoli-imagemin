@@ -4,7 +4,8 @@ var debug = require('debug')('imageminFilter');
 var prettyBytes = require('pretty-bytes');
 var mode = require('stat-mode');
 var fs = require('fs');
-var Promise = require('rsvp').Promise
+var Promise = require('rsvp').Promise;
+var path = require('path');
 
 function imageminFilter(inputTree, optns) {
 	debug('Creating imageminFilter instance');
@@ -47,8 +48,8 @@ imageminFilter.prototype.constructor = imageminFilter;
 
 imageminFilter.prototype.extensions = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
 
-imageminFilter.prototype.processString = function(str, file) {
-  var fileNamePath = './' + this.inputTree + '/' + file;
+imageminFilter.prototype.processString = function(str, srcDir, file) {
+  var fileNamePath = path.join(srcDir, file);
   debug('Processing Buffer ' + fileNamePath);
 
   var extenson = this.targetExtension = file.split('.').pop().toLowerCase();
@@ -87,11 +88,11 @@ imageminFilter.prototype.processString = function(str, file) {
 
 imageminFilter.prototype.processFile = function (srcDir, destDir, relativePath) {
   var self = this
-  var string = fs.readFileSync(srcDir + '/' + relativePath);
-  return self.processString(string, relativePath)
+  var string = fs.readFileSync(path.join(srcDir, relativePath));
+  return self.processString(string, srcDir, relativePath)
     .then(function (outputString) {
       var outputPath = self.getDestFilePath(relativePath)
-      fs.writeFileSync(destDir + '/' + outputPath, outputString)
+      fs.writeFileSync(path.join(destDir, outputPath), outputString)
     });
 };
 
