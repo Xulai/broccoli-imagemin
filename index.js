@@ -2,7 +2,6 @@
 var Filter = require('broccoli-filter');
 var debug = require('debug')('imageminFilter');
 var prettyBytes = require('pretty-bytes');
-var mode = require('stat-mode');
 var fs = require('fs');
 var Promise = require('rsvp').Promise;
 var path = require('path');
@@ -27,7 +26,6 @@ function imageminFilter(inputTree, optns) {
 
 imageminFilter.prototype = Object.create(Filter.prototype);
 imageminFilter.prototype.constructor = imageminFilter;
-
 imageminFilter.prototype.extensions = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
 
 imageminFilter.prototype.processString = function(imageStr, srcDir, file) {
@@ -40,7 +38,8 @@ imageminFilter.prototype.processString = function(imageStr, srcDir, file) {
 	var options = this.options;
   var imagemin = new ImageMin();
 
-	imagemin.use(ImageMin.jpegtran({progressive: options.progressive}))
+	imagemin.src(imageStr)
+					.use(ImageMin.jpegtran({progressive: options.progressive}))
 					.use(ImageMin.gifsicle({interlaced: options.interlaced}))
 					.use(ImageMin.svgo({plugins: options.svgoPlugins || []}));
 
@@ -56,9 +55,8 @@ imageminFilter.prototype.processString = function(imageStr, srcDir, file) {
 	}
 
   return new Promise(function(resolve, reject) {
-
     debug('Optimizing image ' + fileNamePath);
-		imagemin.src(imageStr);
+
     imagemin.run(function (err, filesOpti) {
       if (err) {
         debug(err);
