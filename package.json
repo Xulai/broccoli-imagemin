@@ -1,6 +1,6 @@
 {
   "name": "broccoli-imagemin",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Minifies either png, jpg or gif with Broccoli",
   "homepage": "https://github.com/xulai/broccoli-imagemin",
   "repository": {
@@ -31,19 +31,19 @@
     "test": "broccoli build temp && mocha"
   },
   "dependencies": {
-    "broccoli-filter": "^0.1.0",
-    "imagemin": "^0.4.5",
-		"debug": "^0.8.1",
-		"pretty-bytes": "^0.1.0",
-		"stat-mode": "^0.2.0",
-		"rsvp": "^3.0.3"
+    "broccoli-filter": "^0.1.10",
+		"debug": "^2.1.0",
+    "imagemin": "^3.0.0",
+		"pretty-bytes": "^1.0.1",
+		"rsvp": "^3.0.13",
+		"stat-mode": "^0.2.0"
   },
   "devDependencies": {
-    "broccoli": "^0.9.0",
-    "mocha": "^1.17.1",
-    "rimraf": "^2.2.6",
-    "should": "^3.1.2",
-    "broccoli-cli": "^0.0.1"
+    "broccoli": "^0.13.3",
+		"broccoli-cli": "^0.0.1",
+    "mocha": "^2.0.1",
+    "rimraf": "^2.2.8",
+    "should": "^4.3.0"
   },
   "licenses": [
     {

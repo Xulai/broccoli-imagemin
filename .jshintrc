@@ -1,0 +1,8 @@
+{
+  "undef": true,
+  "unused": false,
+  "node": true,
+	"browser": false,
+	"jquery": false,
+	"esnext": false
+}

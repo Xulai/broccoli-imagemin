@@ -18,28 +18,10 @@ function imageminFilter(inputTree, optns) {
 		interlaced: true,
 		optimizationLevel: 3,
 		progressive: true,
-		lossyPNG: false
+		lossyPNG: false,
+		pngquant: {}
 	};
-
-	var options = this.options;
-	var ImageMin = this.ImageMin = require('imagemin');
-  var imagemin = this.imagemin = new ImageMin();
-
-	imagemin.use(ImageMin.jpegtran(options.progressive))
-					.use(ImageMin.gifsicle(options.interlaced))
-					.use(ImageMin.svgo());
-
-	if(options.lossyPNG) {
-		imagemin.use(ImageMin.pngquant());
-	}
-	else {
-		imagemin.use(ImageMin.optipng(options.optimizationLevel));
-	}
-
-	if(options.use) {
-		options.use.forEach(imagemin.use.bind(imagemin));
-	}
-
+	this.ImageMin = require('imagemin');
   this.inputTree = inputTree;
 }
 
@@ -48,31 +30,46 @@ imageminFilter.prototype.constructor = imageminFilter;
 
 imageminFilter.prototype.extensions = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
 
-imageminFilter.prototype.processString = function(str, srcDir, file) {
+imageminFilter.prototype.processString = function(imageStr, srcDir, file) {
   var fileNamePath = path.join(srcDir, file);
   debug('Processing Buffer ' + fileNamePath);
 
+	var ImageMin = this.ImageMin;
   var extenson = this.targetExtension = file.split('.').pop().toLowerCase();
-  var imagemin = this.imagemin;
-  var tempfile = {};
-  var stats = fs.statSync(fileNamePath);
+	var stats = fs.statSync(fileNamePath);
+	var options = this.options;
+  var imagemin = new ImageMin();
+
+	imagemin.use(ImageMin.jpegtran({progressive: options.progressive}))
+					.use(ImageMin.gifsicle({interlaced: options.interlaced}))
+					.use(ImageMin.svgo({plugins: options.svgoPlugins || []}));
+
+	if(options.lossyPNG) {
+		imagemin.use(ImageMin.pngquant(options.pngquant));
+	}
+	else {
+		imagemin.use(ImageMin.optipng({optimizationLevel: options.optimizationLevel}));
+	}
+
+	if(options.use) {
+		options.use.forEach(imagemin.use.bind(imagemin));
+	}
 
   return new Promise(function(resolve, reject) {
-    tempfile.contents = str;
-    tempfile.mode = mode(stats).toOctal();
 
     debug('Optimizing image ' + fileNamePath);
-    imagemin.run(tempfile, function (err, fileOpti) {
+		imagemin.src(imageStr);
+    imagemin.run(function (err, filesOpti) {
       if (err) {
         debug(err);
         return reject(err);
       }
 
       var origSize = fs.statSync(fileNamePath).size;
-      var diffSize = origSize - fileOpti.contents.length;
+      var diffSize = origSize - filesOpti[0].contents.length;
 
-      if (!(fileOpti.contents.length >= str.length)) {
-        str = fileOpti.contents;
+      if (filesOpti[0].contents.length < imageStr.length) {
+        imageStr = filesOpti[0].contents;
       }
 
       if(diffSize < 10) {
@@ -81,18 +78,18 @@ imageminFilter.prototype.processString = function(str, srcDir, file) {
         debug('Saved ' + prettyBytes(diffSize) + ' - ' + (diffSize / origSize * 100).toFixed() + '%');
       }
 
-      return resolve(str);
+      return resolve(imageStr);
     });
   });
 };
 
 imageminFilter.prototype.processFile = function (srcDir, destDir, relativePath) {
-  var self = this
+  var self = this;
   var string = fs.readFileSync(path.join(srcDir, relativePath));
   return self.processString(string, srcDir, relativePath)
     .then(function (outputString) {
-      var outputPath = self.getDestFilePath(relativePath)
-      fs.writeFileSync(path.join(destDir, outputPath), outputString)
+      var outputPath = self.getDestFilePath(relativePath);
+      fs.writeFileSync(path.join(destDir, outputPath), outputString);
     });
 };
 
